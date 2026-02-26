@@ -1,182 +1,127 @@
-import React, { useState } from "react";
-import Register from "./Register";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Login";
-import Dashboard from "./Dashboard";
+import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
+import Dashboard from "./Dashboard";
 import AdminPage from "./AdminPage";
-
-
-import "./index.css"; 
 import { Toaster } from "react-hot-toast";
-import { signOut } from "firebase/auth";
-import { auth } from "./firebase";
-import toast from "react-hot-toast"; 
+import { LogOut, User } from "lucide-react";
 
+function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const email = localStorage.getItem("email");
+    if (token && email) {
+      setUser({ email });
+    }
+    setLoading(false);
+  }, []);
 
-export default function App() {
-  const [token, setToken] = useState(null);
-  const [showLogin, setShowLogin] = useState(true);
+  const handleLogin = (token, email) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("email", email);
+    setUser({ email });
+  };
 
-const [userEmail, setUserEmail] = useState(null);
-const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    setUser(null);
+  };
 
-
-
-const handleLogin = (idToken) => {
-  const user = auth.currentUser;
-  if (user) {
-    setToken(idToken);
-    setUserEmail(user.email); // ✅ Save user's email here
-    console.log("Logged in as:", user.email);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-emerald-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+      </div>
+    );
   }
-};
-
-
-
-
-
-  // const handleLogin = (idToken) => {
-  //   setToken(idToken);
-  //   console.log("Firebase ID Token:", idToken);
-  // };
-
-
-
-  // const handleLogout = () => {
-  //   setToken(null);
-  //   setShowLogin(true);
-  // };
-
-
-
-
-// function handleLogout() {
-//   signOut(auth)
-//     .then(() => {
-//       setToken(null); // or whatever you use to clear login state
-//       toast.success("Logged out successfully!");
-//     })
-//     .catch((error) => {
-//       toast.error("Logout failed: " + error.message);
-//     });
-// }
-
-function handleLogout() {
-  signOut(auth)
-    .then(() => {
-      setToken(null);
-      setUserEmail(null); // ✅ Clear on logout
-      toast.success("Logged out successfully!");
-    })
-    .catch((error) => {
-      toast.error("Logout failed: " + error.message);
-    });
-}
-
-
-
-
 
   return (
+    <Router>
+      <div className="min-h-screen bg-emerald-50 text-gray-900 font-sans selection:bg-emerald-500 selection:text-white">
+        <Toaster position="bottom-right" toastOptions={{
+          style: {
+            background: '#064e3b',
+            color: '#fff',
+            fontSize: '14px',
+          },
+        }} />
 
+        <nav className="bg-white/80 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16 items-center">
+              <div className="flex items-center gap-3">
+                {/* User Logo/Picture - Replace src with your actual image URL */}
+                <img
+                  src="https://ui-avatars.com/api/?name=Daily+Work&background=059669&color=fff"
+                  alt="Logo"
+                  className="w-10 h-10 rounded-lg shadow-emerald-200 shadow-md object-cover border-2 border-emerald-50"
+                />
+                <span className="font-bold text-xl tracking-tight text-emerald-950">Daily Work Tracker</span>
+              </div>
 
+              {user && (
+                <div className="flex items-center gap-6">
+                  <div className="hidden md:flex items-center gap-2 text-sm font-medium text-emerald-700 bg-emerald-100/50 px-3 py-1 rounded-full">
+                    <User size={16} />
+                    <span>{user.email}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-emerald-600 transition"
+                  >
+                    <LogOut size={18} />
+                    <span className="hidden sm:inline">Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </nav>
 
-    <div className="min-h-screen bg-gradient-to-r from-blue-400 to-purple-600 text-white flex flex-col">
-
-
-<Toaster position="top-center" reverseOrder={false} />
-
-
-      {/* Header */}
-      <header className="flex justify-between items-center px-8 py-4 bg-black bg-opacity-30">
-        <h1 className="text-3xl font-bold">WorkTracker</h1>
-
-
-      <nav>
-  {!token ? (
-    <>
-      {showForgotPassword ? (
-        <button
-          onClick={() => setShowForgotPassword(false)}
-          className="mb-2 px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-black transition bg-white text-black w-full sm:w-auto"
-        >
-          Back to Login
-        </button>
-      ) : (
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
-          <button
-            onClick={() => { setShowLogin(true); setShowForgotPassword(false); }}
-            className={`px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-black transition w-full sm:w-auto ${
-              showLogin ? "bg-white text-black" : "bg-transparent"
-            }`}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => { setShowLogin(false); setShowForgotPassword(false); }}
-            className={`px-4 py-2 rounded-md font-semibold hover:bg-white hover:text-black transition w-full sm:w-auto ${
-              !showLogin ? "bg-white text-black" : "bg-transparent"
-            }`}
-          >
-            Register
-          </button>
-        </div>
-      )}
-    </>
-  ) : (
-    <button
-      onClick={handleLogout}
-      className="px-4 py-2 rounded-md font-semibold bg-red-600 hover:bg-red-700 transition w-full sm:w-auto"
-    >
-      Logout
-    </button>
-  )}
-</nav>
-
-
-
-
-      </header>
-
-
-
-
-   <main className="flex-grow flex flex-col items-center justify-center px-4 text-black">
-  {token ? (
-    userEmail === "suriyaprakash@aactni.edu.in" ? (
-      // Full-width layout for Admin
-      <div className="w-full">
-        <AdminPage />
+        <main className="py-8 px-4 sm:px-6 lg:px-8">
+          <Routes>
+            <Route
+              path="/login"
+              element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/register"
+              element={!user ? <Register /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/forgot-password"
+              element={!user ? <ForgotPassword /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/reset-password"
+              element={!user ? <ResetPassword /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/"
+              element={
+                user ? (
+                  user.email === "suryaprakash0345@gmail.com" ? (
+                    <AdminPage />
+                  ) : (
+                    <Dashboard userEmail={user.email} />
+                  )
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+          </Routes>
+        </main>
       </div>
-    ) : (
-      // Centered layout for normal user
-      <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-10 max-w-md w-full">
-        <Dashboard userEmail={userEmail} />
-      </div>
-    )
-  ) : showForgotPassword ? (
-    <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-10 max-w-md w-full">
-      <ForgotPassword setShowForgotPassword={setShowForgotPassword} />
-    </div>
-  ) : showLogin ? (
-    <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-10 max-w-md w-full">
-      <Login onLogin={handleLogin} setShowForgotPassword={setShowForgotPassword} />
-    </div>
-  ) : (
-    <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-10 max-w-md w-full">
-      <Register />
-    </div>
-  )}
-</main>
-
-
-
-      {/* Footer */}
-      <footer className="py-4 text-center text-white bg-black bg-opacity-30">
-        &copy; 2025 WorkTracker. Developed by Suriya Prakash B.
-      </footer>
-    </div>
-
+    </Router>
   );
 }
+
+export default App;
