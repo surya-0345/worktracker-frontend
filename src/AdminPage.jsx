@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "./api";
 import { ChevronDown, ChevronUp, Search, Download, User, BarChart2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -18,7 +19,7 @@ export default function AdminPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:8080/api/logs?email=suryaprakash0345@gmail.com",
+        `${API_BASE_URL}/api/logs?email=suryaprakash0345@gmail.com`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

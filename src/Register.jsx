@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import API_BASE_URL from "./api";
 import { Mail, Lock, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -12,7 +13,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/auth/register", {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

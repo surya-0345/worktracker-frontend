@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import API_BASE_URL from "./api";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -17,7 +18,7 @@ export default function ForgotPassword() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/auth/reset-password", {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formattedEmail }),

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "./api";
 import toast from "react-hot-toast";
 import { Plus, Edit2, Trash2, Calendar, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,7 +21,7 @@ export default function Dashboard({ userEmail }) {
   const fetchLogs = () => {
     const token = localStorage.getItem("token");
     axios
-      .get(`http://localhost:8080/api/logs?email=${userEmail}`, {
+      .get(`${API_BASE_URL}/api/logs?email=${userEmail}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => setWorkLogs(res.data))
@@ -59,7 +60,7 @@ export default function Dashboard({ userEmail }) {
 
     if (editId) {
       axios
-        .put(`http://localhost:8080/api/logs/${editId}`, logData, config)
+        .put(`${API_BASE_URL}/api/logs/${editId}`, logData, config)
         .then(() => {
           toast.success("Log updated!");
           resetForm();
@@ -68,7 +69,7 @@ export default function Dashboard({ userEmail }) {
         .catch(handleError);
     } else {
       axios
-        .post("http://localhost:8080/api/logs", logData, config)
+        .post(`${API_BASE_URL}/api/logs`, logData, config)
         .then((res) => {
           setWorkLogs([...workLogs, res.data]);
           resetForm();
@@ -89,7 +90,7 @@ export default function Dashboard({ userEmail }) {
     if (!window.confirm("Delete this entry?")) return;
     const token = localStorage.getItem("token");
     axios
-      .delete(`http://localhost:8080/api/logs/${id}`, {
+      .delete(`${API_BASE_URL}/api/logs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(() => {
